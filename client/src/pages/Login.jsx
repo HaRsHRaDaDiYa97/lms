@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// The following imports are commented out as they caused a resolution error.
-// These dependencies need to be correctly configured in your project's features/api/authApi and node_modules.
 import { useLoginUserMutation, useRegisterUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
-// import { useNavigate } from "react-router-dom";
-
-// Placeholder for useLoginUserMutation and useRegisterUserMutation
-// In a real application, you would uncomment the imports above and remove these placeholders.
-
-
 
 // Simple CSS for a spinner (replaces Loader2 from lucide-react)
 const Spinner = () => (

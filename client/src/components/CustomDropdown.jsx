@@ -97,16 +97,17 @@ export const CustomDropdown = ({ user, logoutUser }) => {
                         </button>
                     </Link>
 
-                    <Link to="/dashboard" onClick={() => setIsOpen(false)}>
-                        <button
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200
+                    {user?.role == "instructor" && (
+                        <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200
                             hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md m-1 transition-colors duration-150"
-                            role="menuitem"
-                        >
-                            Dashboard
-                        </button>
-                    </Link>
-
+                                role="menuitem"
+                            >
+                                Dashboard
+                            </button>
+                        </Link>
+                    )}
                     {/* Separator */}
                     <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
