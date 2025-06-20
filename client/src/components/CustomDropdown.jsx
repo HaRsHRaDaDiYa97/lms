@@ -98,7 +98,7 @@ export const CustomDropdown = ({ user, logoutUser }) => {
                     </Link>
 
                     {user?.role == "instructor" && (
-                        <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                        <Link to="/admin/course" onClick={() => setIsOpen(false)}>
                             <button
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200
                             hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md m-1 transition-colors duration-150"

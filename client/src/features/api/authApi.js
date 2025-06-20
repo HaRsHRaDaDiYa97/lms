@@ -56,7 +56,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: baseQueryWithReauth,
+  baseQuery: fetchBaseQuery({
+    baseUrl:USER_API,
+    credentials:"include"
+  }),
   tagTypes: ['User'],
   endpoints: (builder) => ({
     registerUser: builder.mutation({
