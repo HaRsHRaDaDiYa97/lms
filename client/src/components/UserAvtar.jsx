@@ -6,7 +6,6 @@ const UserAvatar = ({ user, size = 'md', className = '' }) => {
         return null; // Or render a default placeholder if no user is provided
     }
 
-    const { name, email, avatar } = user;
 
     // Determine initials
     const getInitials = (name, email) => {
@@ -23,7 +22,7 @@ const UserAvatar = ({ user, size = 'md', className = '' }) => {
         return '?'; // Fallback if no name or email
     };
 
-    const initials = getInitials(name, email);
+    const initials = getInitials(user?.name, user?.email);
 
     // Determine size classes
     let sizeClasses = '';
@@ -57,13 +56,13 @@ const UserAvatar = ({ user, size = 'md', className = '' }) => {
             className={`relative flex items-center justify-center rounded-full overflow-hidden
                         bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200
                         font-medium flex-shrink-0 ${sizeClasses} ${className}`}
-            aria-label={name || email || "User avatar"}
-            title={name || email || "User"}
+            aria-label={user?.name || user?.email || "User avatar"}
+            title={user?.name || user?.email || "User"}
         >
-            {avatar ? (
+            {user?.photoUrl ? (
                 <img
-                    src={avatar}
-                    alt={name || email || "User avatar"}
+                    src={user?.photoUrl}
+                    alt={user?.name || user?.email || "User avatar"}
                     className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => {
                         e.target.onerror = null; // Prevent infinite loop
@@ -72,7 +71,7 @@ const UserAvatar = ({ user, size = 'md', className = '' }) => {
                     }}
                 />
             ) : null}
-            <span className={`initials-fallback ${textSizeClasses} ${avatar ? 'hidden' : 'flex'}`}>
+            <span className={`initials-fallback ${textSizeClasses} ${user?.photoUrl ? 'hidden' : 'flex'}`}>
                 {initials}
             </span>
         </div>

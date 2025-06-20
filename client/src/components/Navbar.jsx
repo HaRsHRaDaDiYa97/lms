@@ -165,8 +165,8 @@ const MobileNavbar = () => {
                         <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                             <UserAvatar user={user} size="md" /> {/* Assuming UserAvatar takes a user prop and size */}
                             <div className="flex flex-col">
-                                <span className="font-semibold text-gray-900 dark:text-white">{user.name || 'Learner'}</span>
-                                <span className="text-sm text-gray-500 dark:text-gray-400">{user.email}</span>
+                                <span className="font-semibold text-gray-900 dark:text-white">{user?.name || 'Learner'}</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</span>
                             </div>
                         </div>
                     )}

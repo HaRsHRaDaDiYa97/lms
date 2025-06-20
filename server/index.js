@@ -4,6 +4,7 @@ import { connectDB } from "./database/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRoutes from "./route/user.route.js";
+import courseRoutes from "./route/course.route.js";
 import compression from "compression";
 import helmet from "helmet";
 import path from "path";
@@ -55,6 +56,8 @@ app.use(
 
 // Routes
 app.use("/api/v1/user", userRoutes);
+
+app.use("/api/v1/course", courseRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === "production") {

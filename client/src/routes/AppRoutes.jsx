@@ -1,26 +1,76 @@
-import RootLayout from "@/layout/RootLayout";
-import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
+import NotFoundPage from "@/components/NotFoundPage";
+import RootLayout from "@/layout/RootLayout";
+import { AddCourse } from "@/pages/admin/course/AddCourse";
+import { CourseTable } from "@/pages/admin/course/CourseTable";
+import Dashboard from "@/pages/admin/Dashboard";
+import Sidebar from "@/pages/admin/Sidebar";
+import { Login } from "@/pages/Login";
+import { Courses } from "@/pages/student/Courses";
+import { MyLearning } from "@/pages/student/MyLearning";
+import Profile from "@/pages/student/Profile";
+import HeroSection from "../pages/student/HeroSection"; // Don't forget this import too
+import AdminLayout from "@/pages/admin/AdminLayout ";
+import { EditCourse } from "@/pages/admin/course/EditCourse";
 
-const Home = lazy(() => import("../pages/student/homepage/Home"));
-const Login = lazy(() => import("../pages/Login"));
-const Profile = lazy(() => import("../pages/student/Profile"));
-const MyLearning = lazy(() => import("../pages/student/MyLearning")); // ✅
-const AppRoutes = createBrowserRouter([
+
+export const appRouter = createBrowserRouter([
   {
-    path: "/", // main route
-    element: <RootLayout />, // this wraps children
+    path: "/",
+    element: <RootLayout />,
+    errorElement: <NotFoundPage />, // Add this for all unmatched routes within MainLayout
     children: [
-      { index: true, element: <Home /> },
-      { path: "profile", element: <Profile /> },
-      { path: "my-learning", element: <MyLearning /> }, // ✅ Fixed!
-    ],
+      {
+        path: "/",
+        element: (
+          <>
+            <HeroSection />
+            <Courses />
+          </>
+        )
+      },
+      {
+        path: "login",
+        element: <Login />
+      },
+      {
+        path: "my-learning",
+        element: <MyLearning />
+      },
+      {
+        path: "profile",
+        element: <Profile />
+      },
+
+      //admin routes start here
+      {
+        path: "admin",
+        element: <AdminLayout />,
+        children:[
+        {
+          path:"dashboard",
+          element:<Dashboard />
+        },
+        {
+          path:"course",
+          element:<CourseTable />
+        },
+         {
+          path:"course/create-course",
+          element:<AddCourse />
+        },
+         {
+          path:"course/:id",
+          element:<EditCourse />
+        },
+        ]
+      },
+
+    ]
   },
+  // Add this catch-all route for any path that doesn't match the above
   {
-    path: "/login", // separate route, not inside layout
-    element: <Login />,
-  },
+    path: "*",
+    element: <NotFoundPage />
+  }
 ]);
-
-
-export default AppRoutes;
