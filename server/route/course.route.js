@@ -1,19 +1,27 @@
 import express from "express";
 import {
   createCourse,
+  createLecture,
+  deleteLecture,
+  editCourse,
+  editLecture,
+  getCourseById,
+  getCourseLecture,
+  getLectureById,
   getMyCourses,
+  togglePublishCourse,
 } from "../controller/course.controller.js";
 
 import isAuthenticated from "../middleware/isAuthenticated.js";
 import isInstructor from "../middleware/isInstructor.js"; // You need to create this middleware
-import { singleUpload } from "../utils/multer.js";
+import { upload } from "../utils/multer.js";
 
 const router = express.Router();
 
 /* ----------------------- Public Routes ----------------------- */
 
 // ✅ Get all published courses
-router.get("/my-courses",isAuthenticated ,isInstructor, getMyCourses);
+router.get("/my-courses", isAuthenticated, isInstructor, getMyCourses);
 
 /* ------------------- Instructor-Only Routes ------------------ */
 
@@ -22,9 +30,42 @@ router.post(
   "/create",
   isAuthenticated,
   isInstructor,
-  singleUpload,
   createCourse
 );
+
+// ✅ Edit Course
+router.put("/edit/:courseId", isAuthenticated, isInstructor, upload.single("courseThumbnail"), editCourse);
+
+
+router.get("/:courseId", isAuthenticated, isInstructor, getCourseById);
+
+router.post("/:courseId/lecture", isAuthenticated, isInstructor, createLecture);
+
+router.get("/:courseId/lectures", isAuthenticated, isInstructor, getCourseLecture);
+
+
+router.get("/lecture/:lectureId", isAuthenticated, isInstructor, getLectureById);
+
+router.put(
+  '/lecture/:lectureId',
+  isAuthenticated,
+  isInstructor,
+  upload.single('video'), // field name must match FormData key
+  editLecture
+);
+
+
+router.delete(
+  "/lecture/:lectureId",
+  isAuthenticated,
+  isInstructor,
+  deleteLecture
+);
+
+
+
+router.put("/:courseId", isAuthenticated, isInstructor, togglePublishCourse);
+
 
 
 export default router;

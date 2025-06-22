@@ -75,22 +75,20 @@ export const courseApi = createApi({
       providesTags: ['Course'],
     }),
 
-    getCourseById: builder.query({
-      query: (courseId) => `${courseId}`,
-      providesTags: ['Course'],
-    }),
+    // getCourseById: builder.query({
+    //   query: (courseId) => `${courseId}`,
+    //   providesTags: ['Course'],
+    // }),
 
-    updateCourse: builder.mutation({
-      query: ({ id, updatedData }) => ({
-        url: `${id}`,
+    editCourse: builder.mutation({
+      query: ({ courseId, formData }) => ({
+        url: `edit/${courseId}`, // ✅ fixed
         method: 'PUT',
-        body: updatedData,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        body: formData, // ✅ FormData will automatically set correct headers
       }),
       invalidatesTags: ['Course'],
     }),
+
 
     deleteCourse: builder.mutation({
       query: (id) => ({
@@ -99,6 +97,74 @@ export const courseApi = createApi({
       }),
       invalidatesTags: ['Course'],
     }),
+    getCourseById: builder.query({
+      query: (courseId) => ({
+        url: `/${courseId}`,
+        method: "GET"
+      }),
+    }),
+    createLecture: builder.mutation({
+      query: ({ courseId, lectureTitle }) => ({
+        url: `/${courseId}/lecture`,
+        method: 'POST',
+        body: { lectureTitle }, // ✅ Matches the model
+      }),
+    }),
+    getCourseLectures: builder.query({
+      query: (courseId) => ({
+        url: `/${courseId}/lectures`,
+        method: 'GET',
+
+      }),
+      providesTags: (result, error, courseId) => [{ type: 'CourseLectures', id: courseId }],
+    }),
+
+    editLecture: builder.mutation({
+      query: ({ lectureId, lectureTitle, isPreviewFree, videoFile }) => {
+        const formData = new FormData();
+        formData.append("lectureTitle", lectureTitle);
+        formData.append("isPreviewFree", isPreviewFree);
+        if (videoFile) formData.append("video", videoFile);
+
+        return {
+          url: `/lecture/${lectureId}`,
+          method: "PUT",
+          body: formData,
+        };
+      },
+    }),
+
+    getLectureById: builder.query({
+      query: (lectureId) => `/lecture/${lectureId}`,
+    }),
+
+    deleteLecture: builder.mutation({
+      query: ({ lectureId }) => ({
+        url: `/lecture/${lectureId}`, // Make sure lectureId is defined
+        method: "DELETE",
+      }),
+      async onQueryStarted({ lectureId, courseId }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            courseApi.util.invalidateTags([{ type: 'CourseLectures', id: courseId }])
+          );
+        } catch (err) {
+          console.error("Delete failed. Refetch skipped.");
+        }
+      },
+    }),
+
+
+    // courseApi.js
+    publishCourse: builder.mutation({
+      query: ({ courseId, publish }) => ({
+        url: `/${courseId}?publish=${publish}`,
+        method: 'PUT',
+      }),
+    }),
+
+
   }),
 });
 
@@ -106,6 +172,13 @@ export const {
   useCreateCourseMutation,
   useGetAllCoursesQuery,
   useGetCourseByIdQuery,
-  useUpdateCourseMutation,
+  useEditCourseMutation,
   useDeleteCourseMutation,
+  useCreateLectureMutation,
+  useGetCourseLecturesQuery,
+  useEditLectureMutation,
+  useGetLectureByIdQuery,
+  useDeleteLectureMutation,
+  usePublishCourseMutation,
+
 } = courseApi;

@@ -12,6 +12,8 @@ import Profile from "@/pages/student/Profile";
 import HeroSection from "../pages/student/HeroSection"; // Don't forget this import too
 import AdminLayout from "@/pages/admin/AdminLayout ";
 import { EditCourse } from "@/pages/admin/course/EditCourse";
+import { CreateLecture } from "@/pages/admin/lecture/CreateLecture";
+import { EditLecture } from "@/pages/admin/lecture/EditLecture";
 
 
 export const appRouter = createBrowserRouter([
@@ -46,23 +48,31 @@ export const appRouter = createBrowserRouter([
       {
         path: "admin",
         element: <AdminLayout />,
-        children:[
-        {
-          path:"dashboard",
-          element:<Dashboard />
-        },
-        {
-          path:"course",
-          element:<CourseTable />
-        },
-         {
-          path:"course/create-course",
-          element:<AddCourse />
-        },
-         {
-          path:"course/:id",
-          element:<EditCourse />
-        },
+        children: [
+          {
+            path: "dashboard",
+            element: <Dashboard />
+          },
+          {
+            path: "course",
+            element: <CourseTable />
+          },
+          {
+            path: "course/create-course",
+            element: <AddCourse />
+          },
+          {
+            path: "/admin/course/:courseId",
+            element: <EditCourse />
+          },
+          {
+            path: "/admin/course/:courseId/lecture",
+            element: <CreateLecture />
+          },
+          {
+            path: "/admin/course/:courseId/lecture/:lectureId",
+            element: <EditLecture />
+          },
         ]
       },
 

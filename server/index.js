@@ -25,18 +25,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
-// allow multiple origins
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+// Allow requests from localhost and devices on same network (192.168.*.*)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174"
+];
 
+// CORS Middleware
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow no origin (e.g. Postman) or matching allowed origins or mobile IPs
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      origin.startsWith("http://192.168.")
+    ) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS: " + origin));
     }
   },
-  credentials: true, // if using cookies/auth headers
+  credentials: true, // allow cookies/headers like Authorization
 }));
 
 
@@ -68,6 +77,6 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
