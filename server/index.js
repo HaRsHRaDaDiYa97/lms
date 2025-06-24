@@ -11,6 +11,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import paymentRoutes from "./route/paymentRoutes.js"
 import purchaseRoutes from "./route/purchaseRoute.js"
+import progressRoutes from "./route/progress.route.js"
+
 
 dotenv.config();
 connectDB();
@@ -70,9 +72,13 @@ app.use("/api/v1/user", userRoutes);
 
 app.use("/api/v1/course", courseRoutes);
 
-app.use("/api/purchase", purchaseRoutes); // 👈 Register this too
+app.use("/api/v1/purchase", purchaseRoutes); // 👈 Register this too
 
-app.use("/api/payment", paymentRoutes);
+app.use("/api/v1/payment", paymentRoutes);
+
+app.use("/api/v1/progress", progressRoutes);
+
+
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === "production") {
