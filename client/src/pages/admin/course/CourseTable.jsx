@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGetAllCoursesQuery } from '@/features/api/courseApi';
+import {  useGetAllMyCoursesQuery } from '@/features/api/courseApi';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import React Icons
 
@@ -7,7 +7,7 @@ export const CourseTable = () => {
     const navigate = useNavigate();
 
     // RTK Query hook
-    const { data, isLoading, isError, error } = useGetAllCoursesQuery();
+    const { data, isLoading, isError, error } = useGetAllMyCoursesQuery();
     const courses = data?.courses || [];
 
     // Helper to format date
@@ -38,7 +38,7 @@ export const CourseTable = () => {
                     Course Management
                 </h2>
                 <button
-                    onClick={() => navigate("/admin/course/create-course")}
+                    onClick={() => navigate("/instructor/course/create-course")}
                     className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg shadow-md
                                hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800
                                transition-all duration-300 ease-in-out transform hover:-translate-y-1"
@@ -128,12 +128,7 @@ export const CourseTable = () => {
                                             >
                                                 <FaEdit className="h-5 w-5" /> {/* React Icon */}
                                             </button>
-                                            <button
-                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200 transition duration-150 ease-in-out"
-                                                aria-label="Delete"
-                                            >
-                                                <FaTrash className="h-5 w-5" /> {/* React Icon */}
-                                            </button>
+                                          
                                         </div>
                                     </td>
                                 </tr>

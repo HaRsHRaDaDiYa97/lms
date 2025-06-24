@@ -1,22 +1,23 @@
-import { useCreateCourseMutation } from '@/features/api/courseApi';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useCreateCourseMutation } from '@/features/api/courseApi';
 
 export const AddCourse = () => {
-
     const [courseTitle, setCourseTitle] = useState('');
     const [courseDescription, setCourseDescription] = useState('');
     const [category, setCategory] = useState('');
     const [coursePrice, setCoursePrice] = useState('');
-    const navigation = useNavigate();
+
+    const navigate = useNavigate();
     const [createCourse, { isLoading, isSuccess, isError, error }] = useCreateCourseMutation();
 
-    // ✅ Show toast when course is added or error happens
+    // Show toast when course is added or error happens
     useEffect(() => {
         if (isSuccess) {
             toast.success('🎉 Course created successfully!');
-           navigation("/admin/course")
+            navigate("/instructor/course");
+            // Optionally reset form fields after successful creation and navigation
             setCourseTitle('');
             setCourseDescription('');
             setCategory('');
@@ -25,9 +26,9 @@ export const AddCourse = () => {
         if (isError) {
             toast.error(error?.data?.message || '❌ Failed to create course!');
         }
-    }, [isSuccess, isError, error]);
+    }, [isSuccess, isError, error, navigate]);
 
-    // ✅ Submit handler
+    // Submit handler
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -36,117 +37,155 @@ export const AddCourse = () => {
                 courseDescription,
                 category,
                 coursePrice: parseFloat(coursePrice),
+
             }).unwrap();
-            
         } catch (err) {
-            // handled in useEffect
+            // Error is handled in useEffect
         }
     };
+
+
+
     return (
-        <div className="mt-25 md:mt-16 p-4 sm:p-6 lg:p-8 rounded-xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 max-w-2xl mx-auto">
-            {/* Header with Title */}
-            <div className="mb-6">
-                <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center">
-                    Add New Course
-                </h2>
-                <p className="text-center text-gray-600 dark:text-gray-400 mt-2">
-                    Fill in the details below to create a new course.
-                </p>
+        <div className="min-h-screen mt-5 dark:bg-gray-900 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+            <div className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8">
+                {/* Header */}
+                <div className="flex justify-between items-center mb-8 pb-4 border-b dark:border-gray-700">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                        Add New Course Details
+                    </h1>
+                    {/* The "Go to lectures page" button is more appropriate for an edit page,
+                        but keeping it here for design consistency if desired.
+                        Consider removing or changing its functionality for an add page. */}
+                    <button
+                        onClick={() => navigate('/instructor/course')} // Example navigation
+                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 font-medium transition-colors duration-200"
+                    >
+                        View All Courses
+                    </button>
+                </div>
+
+                {/* Action Buttons Section - Adjusted for Add Course */}
+                <div className="flex justify-end items-center mb-8 gap-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mr-auto">
+                        Fill in the details below to create your new course.
+                    </p>
+                    {/* Publishing and Removing buttons are not typical for a new course creation form,
+                        but can be adapted if your workflow allows immediate publishing upon creation.
+                        For now, only the "Add Course" button will perform the main action. */}
+                </div>
+
+                {/* Form Fields */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Basic Course Information */}
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white border-b pb-2 mb-4 border-gray-200 dark:border-gray-700">
+                        Basic Course Information
+                    </h2>
+
+                    <div>
+                        <label htmlFor="courseTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Title
+                        </label>
+                        <input
+                            type="text"
+                            id="courseTitle"
+                            value={courseTitle}
+                            onChange={(e) => setCourseTitle(e.target.value)}
+                            className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700
+                                       focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="e.g., The Complete Web Development Bootcamp"
+                            required
+                        />
+                    </div>
+
+
+
+                    <div>
+                        <label htmlFor="courseDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Description
+                        </label>
+                        {/* This part mimics a rich text editor UI, but uses a textarea for simplicity */}
+                        <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden bg-white dark:bg-gray-700">
+                            <div className="flex items-center space-x-2 p-2 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                                {/* Mimicking the formatting toolbar */}
+                                <span className="font-bold text-gray-700 dark:text-gray-300">Normal</span>
+                                <span className="text-gray-500 dark:text-gray-400">|</span>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-bold">B</button>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 italic">I</button>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 underline">U</button>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300">🔗</button>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300">📊</button>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300">📝</button>
+                                <button type="button" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300">✂️</button>
+                            </div>
+                            <textarea
+                                id="courseDescription"
+                                rows="6"
+                                value={courseDescription}
+                                onChange={(e) => setCourseDescription(e.target.value)}
+                                className="block w-full py-2 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700 resize-y
+                                           focus:outline-none sm:text-sm"
+                                placeholder="Write a detailed description of your course..."
+                                required
+                            ></textarea>
+                        </div>
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            Provide a comprehensive overview of your course content and learning objectives.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        {/* Category Input */}
+                        <div>
+                            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Category
+                            </label>
+                            <input
+                                type="text"
+                                id="category"
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700
+                                           focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                placeholder="e.g., Web Development"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="coursePrice" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Price in (INR)
+                            </label>
+                            <input
+                                type="number"
+                                id="coursePrice"
+                                value={coursePrice}
+                                onChange={(e) => setCoursePrice(e.target.value)}
+                                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-700
+                                           focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                placeholder="e.g., 299"
+                                min="0"
+                                step="0.01"
+                                required
+                            />
+                        </div>
+                    </div>
+
+
+                    {/* Footer (Add Course Button) */}
+                    <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700
+                                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? 'Adding Course...' : 'Add Course'}
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            {/* Course Submission Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Course Title Input */}
-                <div>
-                    <label htmlFor="courseTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Course Title
-                    </label>
-                    <input
-                        type="text"
-                        id="courseTitle"
-                        name="courseTitle"
-                        value={courseTitle}
-                        onChange={(e) => setCourseTitle(e.target.value)}
-                        placeholder="e.g., Introduction to React"
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm
-                                   bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
-                                   focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required
-                    />
-                </div>
-
-                {/* Course Description Textarea */}
-                <div>
-                    <label htmlFor="courseDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Course Description
-                    </label>
-                    <textarea
-                        id="courseDescription"
-                        name="courseDescription"
-                        rows="4"
-                        value={courseDescription}
-                        onChange={(e) => setCourseDescription(e.target.value)}
-                        placeholder="Provide a detailed description of the course content and objectives."
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm
-                                   bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
-                                   focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-y"
-                        required
-                    ></textarea>
-                </div>
-
-                {/* Category Input */}
-                <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Category
-                    </label>
-                    <input
-                        type="text"
-                        id="category"
-                        name="category"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        placeholder="e.g., Programming, Design, Marketing"
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm
-                                   bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
-                                   focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required
-                    />
-                </div>
-
-                {/* Course Price Input */}
-                <div>
-                    <label htmlFor="coursePrice" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Course Price ($)
-                    </label>
-                    <input
-                        type="number"
-                        id="coursePrice"
-                        name="coursePrice"
-                        value={coursePrice}
-                        onChange={(e) => setCoursePrice(e.target.value)}
-                        placeholder="e.g., 99.99"
-                        min="0"
-                        step="0.01"
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm
-                                   bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
-                                   focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required
-                    />
-                </div>
-
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                 
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md
-                               hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800
-                               transition-all duration-300 ease-in-out transform hover:-translate-y-1"
-                >
-                    Add Course
-                </button>
-            </form>
-
-
         </div>
     );
 };
