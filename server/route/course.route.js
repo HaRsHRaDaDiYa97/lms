@@ -5,6 +5,7 @@ import {
   deleteLecture,
   editCourse,
   editLecture,
+  getAllCourses,
   getCourseById,
   getCourseLecture,
   getLectureById,
@@ -33,15 +34,18 @@ router.post(
   createCourse
 );
 
+
+router.get("/all", getAllCourses);
+
 // ✅ Edit Course
 router.put("/edit/:courseId", isAuthenticated, isInstructor, upload.single("courseThumbnail"), editCourse);
 
 
-router.get("/:courseId", isAuthenticated, isInstructor, getCourseById);
+router.get("/:courseId", isAuthenticated, getCourseById);
 
 router.post("/:courseId/lecture", isAuthenticated, isInstructor, createLecture);
 
-router.get("/:courseId/lectures", isAuthenticated, isInstructor, getCourseLecture);
+router.get("/:courseId/lectures", isAuthenticated, getCourseLecture);
 
 
 router.get("/lecture/:lectureId", isAuthenticated, isInstructor, getLectureById);

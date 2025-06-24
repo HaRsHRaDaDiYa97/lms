@@ -81,7 +81,7 @@ export const EditCourse = () => {
         // 🛑 Prevent publishing if no lectures
         if (publishState === "true" && (!course?.lectures || course.lectures.length === 0)) {
             toast.error("Please add at least one lecture before publishing.");
-            navigate(`/admin/course/${courseId}/lecture`);
+            navigate(`/instructor/course/${courseId}/lecture`);
             return;
         }
 
@@ -89,7 +89,7 @@ export const EditCourse = () => {
         const hasLectureWithVideo = course.lectures?.some((lecture) => !!lecture.videoUrl);
         if (publishState === "true" && !hasLectureWithVideo) {
             toast.error("Please upload at least one lecture video before publishing.");
-            navigate(`/admin/course/${courseId}/lecture`);
+            navigate(`/instructor/course/${courseId}/lecture`);
             return;
         }
 
@@ -113,7 +113,7 @@ export const EditCourse = () => {
                         Add detail information regarding course
                     </h1>
                     <button
-                        onClick={() => navigate(`/admin/course/${courseId}/lecture`)}
+                        onClick={() => navigate(`/instructor/course/${courseId}/lecture`)}
                         className="text-indigo-600 cursor-pointer hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 font-medium"
                     >
                         Go to lectures page
@@ -255,7 +255,7 @@ export const EditCourse = () => {
                         {isLoading ? "Saving..." : "Save Changes"}
                     </button>
                     <button
-                        onClick={() => navigate(`/admin/course`)}
+                        onClick={() => navigate(`/instructor/course`)}
                         className="px-8 py-3 cursor-pointer border-[1px] border-black text-base font-medium rounded-md shadow-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Back

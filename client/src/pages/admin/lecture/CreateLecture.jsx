@@ -77,7 +77,7 @@ export const CreateLecture = () => {
                         </button>
                         <button
                             type="button"
-                            onClick={() => navigate(`/admin/course/${courseId}`)}
+                            onClick={() => navigate(`/instructor/course/${courseId}`)}
                             className="px-8 cursor-pointer py-3 border-[1px] border-black text-base font-medium rounded-md shadow-sm text-black bg-white
                          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
                         >

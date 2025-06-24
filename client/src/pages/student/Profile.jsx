@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ProfileEditModal from './ProfileEditModal';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import { CourseCard } from './Course';
 
 
 // --- Main Profile Component ---

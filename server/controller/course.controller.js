@@ -2,6 +2,7 @@ import { Course } from "../model/course.model.js";
 import { Lecture } from "../model/lecture.model.js";
 
 import { uploadMedia, deleteMedia } from "../utils/cloudinary.js"; // path as per your project
+import { uploadStreamToCloudinary } from "../utils/multer.js";
 // @desc    Create a new course
 export const createCourse = async (req, res) => {
   try {
@@ -29,6 +30,33 @@ export const createCourse = async (req, res) => {
     res.status(201).json({ message: "Course created successfully", course: newCourse });
   } catch (error) {
     res.status(500).json({ message: "Course creation failed", error: error.message });
+  }
+};
+// controller/course.controller.js
+
+export const getAllCourses = async (req, res) => {
+  try {
+    const courses = await Course.find({ isPublished: true }) // or {} to get all courses
+      .populate({
+        path: "creator",
+       
+      });
+
+    const formattedCourses = courses.map(course => ({
+      _id: course._id,
+      courseTitle: course.courseTitle,
+      courseDescription: course.courseDescription,
+      courseThumbnail: course.courseThumbnail,
+      coursePrice: course.coursePrice,
+      category: course.category,
+      courseLevel: course.courseLevel,
+      instructor: course.creator, // now includes fullName
+    }));
+
+    res.status(200).json({ success: true, courses: formattedCourses });
+  } catch (error) {
+    console.error("Get All Courses Error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch courses" });
   }
 };
 
@@ -113,34 +141,27 @@ export const editCourse = async (req, res) => {
 };
 
 
-
 export const getCourseById = async (req, res) => {
   try {
     const { courseId } = req.params;
 
     const course = await Course.findById(courseId)
-      .populate("creator", "-password") // populate creator without password
-    // .populate("lectures") // optionally, remove if not needed
-    // .populate("enrolledStudents", "name email"); // optionally, customize fields
+      .populate({
+        path: "lectures",
+       
+      })
+      .populate({
+        path: "creator",
+        select: "name email photoUrl bio role location"
+      });
 
     if (!course) {
-      return res.status(404).json({
-        success: false,
-        message: "Course not found",
-      });
+      return res.status(404).json({ message: "Course not found" });
     }
 
-    res.status(200).json({
-      success: true,
-      course,
-    });
+    return res.status(200).json({ success: true, course });
   } catch (error) {
-    console.error("Get Course By ID Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-      error: error.message,
-    });
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -226,7 +247,7 @@ export const editLecture = async (req, res) => {
       }
 
       // Upload new video
-      const uploadResult = await uploadMedia(req.file.buffer);
+      const uploadResult = await uploadStreamToCloudinary(req.file.buffer);
       lecture.videoUrl = uploadResult.secure_url;
       lecture.publicId = uploadResult.public_id;
     }

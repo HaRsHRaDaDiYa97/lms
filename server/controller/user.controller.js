@@ -101,10 +101,26 @@ export const logout = async (req, res) => {
   }
 };
 
+
 export const getUserProfile = async (req, res) => {
   try {
-    // Now using req.user instead of req.id
-    const user = req.user;
+    // Fetch user again from DB with population
+    const user = await User.findById(req.user._id)
+      .populate({
+        path: "enrolledCourses",
+        select: "courseTitle courseDescription coursePrice courseThumbnail creator",
+        populate: {
+          path: "creator",
+          select: "name",
+        },
+      });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -116,7 +132,7 @@ export const getUserProfile = async (req, res) => {
         bio: user.bio,
         location: user.location,
         role: user.role,
-        enrolledCourses: user.enrolledCourses,
+        enrolledCourses: user.enrolledCourses, // ✅ now contains full course objects
         createdAt: user.createdAt,
       },
     });

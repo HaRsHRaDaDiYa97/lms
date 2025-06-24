@@ -16,7 +16,7 @@ export const AddCourse = () => {
     useEffect(() => {
         if (isSuccess) {
             toast.success('🎉 Course created successfully!');
-            navigate("/admin/course");
+            navigate("/instructor/course");
             // Optionally reset form fields after successful creation and navigation
             setCourseTitle('');
             setCourseDescription('');
@@ -58,7 +58,7 @@ export const AddCourse = () => {
                         but keeping it here for design consistency if desired.
                         Consider removing or changing its functionality for an add page. */}
                     <button
-                        onClick={() => navigate('/admin/course')} // Example navigation
+                        onClick={() => navigate('/instructor/course')} // Example navigation
                         className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 font-medium transition-colors duration-200"
                     >
                         View All Courses

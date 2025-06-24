@@ -9,6 +9,8 @@ import compression from "compression";
 import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "url";
+import paymentRoutes from "./route/paymentRoutes.js"
+import purchaseRoutes from "./route/purchaseRoute.js"
 
 dotenv.config();
 connectDB();
@@ -67,6 +69,10 @@ app.use(
 app.use("/api/v1/user", userRoutes);
 
 app.use("/api/v1/course", courseRoutes);
+
+app.use("/api/purchase", purchaseRoutes); // 👈 Register this too
+
+app.use("/api/payment", paymentRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === "production") {

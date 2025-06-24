@@ -239,7 +239,7 @@ const MobileNavbar = () => {
                         {user?.role === "instructor" && (
                             <div className="pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
                                 <Link
-                                    to="/dashboard"
+                                    to="/instructor/course"
                                     className="flex items-center justify-center gap-3 w-full px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
                                     onClick={() => setIsSheetOpen(false)}
                                 >

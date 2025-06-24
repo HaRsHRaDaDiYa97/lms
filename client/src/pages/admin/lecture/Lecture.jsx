@@ -8,7 +8,7 @@ export const Lecture = ({ lectureId, courseId, lecture, index }) => {
 const navigate = useNavigate();
 
 const gotoUpdateLecture = () => {
-navigate(`/admin/course/${courseId}/lecture/${lectureId}`);
+navigate(`/instructor/course/${courseId}/lecture/${lectureId}`);
 }
 
   return (

@@ -35,7 +35,7 @@ const Sidebar = () => {
             >
                 <nav className="flex flex-col gap-3 flex-grow p-2">
                     <Link
-                        to="/admin/dashboard"
+                        to="/instructor/dashboard"
                         className={`flex items-center gap-4 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300
                                      hover:bg-blue-50 dark:hover:bg-gray-700
                                      transition-colors duration-200 ease-in-out
@@ -47,7 +47,7 @@ const Sidebar = () => {
                     </Link>
 
                     <Link
-                        to="/admin/course"
+                        to="/instructor/course"
                         className={`flex items-center gap-4 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300
                                      hover:bg-blue-50 dark:hover:bg-gray-700
                                      transition-colors duration-200 ease-in-out

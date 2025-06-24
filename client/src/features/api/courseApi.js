@@ -70,8 +70,15 @@ export const courseApi = createApi({
     }),
 
     // Get logged-in user's courses
-    getAllCourses: builder.query({
+    getAllMyCourses: builder.query({
       query: () => '/my-courses',
+      providesTags: ['Course'],
+    }),
+    getAllCourses: builder.query({
+      query: () => ({
+        url: '/all',
+        method: 'GET',
+      }),
       providesTags: ['Course'],
     }),
 
@@ -97,6 +104,7 @@ export const courseApi = createApi({
       }),
       invalidatesTags: ['Course'],
     }),
+    
     getCourseById: builder.query({
       query: (courseId) => ({
         url: `/${courseId}`,
@@ -180,5 +188,6 @@ export const {
   useGetLectureByIdQuery,
   useDeleteLectureMutation,
   usePublishCourseMutation,
+  useGetAllMyCoursesQuery,
 
 } = courseApi;
