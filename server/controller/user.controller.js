@@ -42,9 +42,12 @@ export const register = async (req, res) => {
   }
 };
 
+
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -52,15 +55,21 @@ export const login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
-    if (!user) {
+    // ✅ Step 1: Find user WITH password
+    const userWithPassword = await User.findOne({ email }).populate({
+      path: "enrolledCourses",
+      select: "_id title thumbnail price", // add more fields if needed
+    });
+
+    if (!userWithPassword) {
       return res.status(400).json({
         success: false,
         message: "Invalid credentials",
       });
     }
 
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    // ✅ Step 2: Check password
+    const isPasswordMatch = await bcrypt.compare(password, userWithPassword.password);
     if (!isPasswordMatch) {
       return res.status(400).json({
         success: false,
@@ -68,8 +77,22 @@ export const login = async (req, res) => {
       });
     }
 
-    generateToken(res, user, `Welcome back ${user.name}`);
+    // ✅ Step 3: Remove password and format response
+    const { password: _, ...rest } = userWithPassword._doc;
 
+    // ✅ Step 4: Generate token and set cookie
+    const token = generateToken(res, userWithPassword);
+
+    // ✅ Step 5: Return full user data with enrolledCourses
+    res.status(200).json({
+      success: true,
+      message: `Welcome back ${rest.name}`,
+      token,
+      user: {
+        ...rest,
+        enrolledCourses: userWithPassword.enrolledCourses, // ✅ included
+      },
+    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({
@@ -78,6 +101,7 @@ export const login = async (req, res) => {
     });
   }
 };
+
 
 export const logout = async (req, res) => {
   try {
@@ -218,5 +242,30 @@ export const updateProfile = async (req, res) => {
       success: false,
       message: error.message || "Internal server error",
     });
+  }
+};
+
+
+
+export const getEnrolledCourses = async (req, res) => {
+  try {
+    const userId = req.user._id; // from auth middleware
+
+    const user = await User.findById(userId).populate({
+      path: "enrolledCourses",
+      populate: {
+        path: "creator", // If your Course has instructor reference
+        select: "name",
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ courses: user.enrolledCourses });
+  } catch (error) {
+    console.error("Error getting enrolled courses:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 // Import icons from react-icons (Material Design Icons example)
 import { MdBook, MdClose, MdDashboard, MdLogin,  MdMenu, MdPerson, MdSchool, MdVpnKey } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useLogoutUserMutation } from "@/features/api/authApi";
+import { useDispatch, useSelector } from "react-redux";
+import { authApi, useLogoutUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
 import { DarkMode } from "@/DarkMode";
 import { CustomDropdown } from "./CustomDropdown";
 import UserAvatar from "./UserAvtar";
+import { userLoggedOut } from "@/features/authSlice";
+import { progressApi } from "@/features/api/progressApi";
+import { courseApi } from "@/features/api/courseApi";
 
 
 export const Navbar = () => {
@@ -97,17 +100,25 @@ const MobileNavbar = () => {
     const [logoutUser] = useLogoutUserMutation();
     const navigate = useNavigate();
 
+
+const dispatch = useDispatch();
+
     // Handler for user logout
     const handleLogout = async () => {
-        try {
-            await logoutUser().unwrap();
-            setIsSheetOpen(false); // Close the mobile menu after logout
-            navigate('/login');
-            toast.success("Logged out successfully");
-        } catch (error) {
-            toast.error("Logout failed. Please try again.");
-            console.error("Logout error:", error);
-        }
+          try {
+      await logoutUser().unwrap(); // 🔁 logs out from backend
+      dispatch(userLoggedOut());   // 🔁 clear auth state
+
+      // 🔁 Reset RTK Query cache for all APIs
+      dispatch(authApi.util.resetApiState());
+      dispatch(progressApi.util.resetApiState());
+      dispatch(courseApi.util.resetApiState());
+
+      navigate("/login");
+      toast.success("Logged out successfully");
+    } catch (error) {
+      toast.error("Logout failed");
+    }
     };
 
     return (

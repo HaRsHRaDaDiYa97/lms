@@ -1,3 +1,4 @@
+// server/controller/paymentController.js
 import Razorpay from "razorpay";
 import dotenv from "dotenv";
 import PurchaseCourse from "../model/PurchaseCourse.model.js";
@@ -13,43 +14,41 @@ const razorpayInstance = new Razorpay({
 export const createOrder = async (req, res) => {
   const { amount } = req.body;
 
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ success: false, message: "Invalid amount" });
+  }
+
   try {
     const options = {
-      amount: amount * 100, // Razorpay expects paise
+      amount: amount * 100, // paise
       currency: "INR",
-      receipt: "receipt_order_" + Math.random().toString(36).slice(2),
+      receipt: "receipt_" + Date.now(),
     };
 
     const order = await razorpayInstance.orders.create(options);
+    console.log("✅ Razorpay order created:", order);
+
     res.status(200).json({ success: true, order });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error) {
+    console.error("❌ Razorpay order error:", error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-
 
 export const savePurchase = async (req, res) => {
   try {
     const { userId, courseId, amount, paymentId, status } = req.body;
 
-    // Debug logs to ensure IDs are correct
-    console.log("🧾 Incoming purchase details:");
-    console.log("User ID:", userId);
-    console.log("Course ID:", courseId);
+    if (!userId || !courseId || !amount || !paymentId || !status) {
+      return res.status(400).json({ success: false, message: "Missing fields" });
+    }
 
-    // Check if user and course exist
     const user = await User.findById(userId);
     const course = await Course.findById(courseId);
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!course) return res.status(404).json({ success: false, message: "Course not found" });
 
-    if (!course) {
-      return res.status(404).json({ success: false, message: "Course not found" });
-    }
-
-    // 1. Save purchase record
     const purchase = await PurchaseCourse.create({
       userId,
       courseId,
@@ -58,35 +57,21 @@ export const savePurchase = async (req, res) => {
       status,
     });
 
-    // 2. Add user to course's enrolledStudents
-    const updatedCourse = await Course.findByIdAndUpdate(
-      courseId,
-      { $addToSet: { enrolledStudents: userId } },
-      { new: true }
-    );
-    console.log("✅ Course updated with enrolled student");
+    await Course.findByIdAndUpdate(courseId, {
+      $addToSet: { enrolledStudents: userId },
+    });
 
-    // 3. Add course to user's enrolledCourses
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { enrolledCourses: courseId } },
-      { new: true }
-    );
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { enrolledCourses: courseId },
+    });
 
-    if (!updatedUser) {
-      console.log("❌ Failed to update user");
-    } else {
-      console.log("✅ User updated with enrolled course:", updatedUser.enrolledCourses);
-    }
-
-    // 4. Respond success
     res.status(201).json({
       success: true,
-      message: "Purchase successful and enrollment updated",
+      message: "Purchase saved and enrollment updated",
       purchase,
     });
   } catch (error) {
-    console.error("❌ Save purchase error:", error.message);
+    console.error("❌ Save purchase error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

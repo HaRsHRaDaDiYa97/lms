@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUserMutation, useRegisterUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
 
 // Simple CSS for a spinner (replaces Loader2 from lucide-react)
 const Spinner = () => (
@@ -11,72 +12,69 @@ const Spinner = () => (
 );
 
 export const Login = () => { // Changed to default export for canvas preview
-    const [signupInput, setSignupInput] = useState({ name: "", email: "", password: "" });
-    const [loginInput, setLoginInput] = useState({ email: "", password: "" });
-    const [activeTab, setActiveTab] = useState("login"); // State to manage active tab
 
-    const [registerUser, { data: registerData, isSuccess: registerIsSuccess, error: registerError, isLoading: registerIsLoading }] = useRegisterUserMutation();
-    const [loginUser, { data: loginData, isSuccess: loginIsSuccess, error: loginError, isLoading: loginIsLoading }] = useLoginUserMutation();
 
-    const navigate = useNavigate();
+const [signupInput, setSignupInput] = useState({ name: "", email: "", password: "" });
+  const [loginInput, setLoginInput] = useState({ email: "", password: "" });
+  const [activeTab, setActiveTab] = useState("login");
 
-    const changeInputHandler = (e, type) => {
-        const { name, value } = e.target;
-        if (type === "signup") {
-            setSignupInput({ ...signupInput, [name]: value });
-        } else {
-            setLoginInput({ ...loginInput, [name]: value });
-        }
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  const [registerUser, { data: registerData, isSuccess: registerIsSuccess, error: registerError, isLoading: registerIsLoading }] = useRegisterUserMutation();
+  const [loginUser, { data: loginData, isSuccess: loginIsSuccess, error: loginError, isLoading: loginIsLoading }] = useLoginUserMutation();
+
+  const changeInputHandler = (e, type) => {
+    const { name, value } = e.target;
+    if (type === "signup") {
+      setSignupInput({ ...signupInput, [name]: value });
+    } else {
+      setLoginInput({ ...loginInput, [name]: value });
     }
+  };
 
-    const handleRegistration = async (type) => {
-        const inputData = type === "signup" ? signupInput : loginInput;
-        const action = type === "signup" ? registerUser : loginUser;
-        await action(inputData);
+  const handleRegistration = async (type) => {
+    const inputData = type === "signup" ? signupInput : loginInput;
 
+    try {
+      if (type === "signup") {
+        await registerUser(inputData).unwrap();
+      } else {
+        const res = await loginUser(inputData).unwrap();
+        dispatch(userLoggedIn({ user: res.user, token: res.token })); // ✅ Update Redux
+      }
+    } catch (error) {
+      // Handled in useEffect
     }
+  };
 
-   useEffect(() => {
-    // Handle successful registration
+  // ✅ Redirect after login
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     if (registerIsSuccess && registerData) {
-        setTimeout(() => {
-            toast.success(registerData.message || "Signup Successful.");
-            setActiveTab("login"); // Switch to login tab after successful signup
-            setSignupInput({ name: "", email: "", password: "" }); // Clear signup form
-        }, 0);
+      toast.success(registerData.message || "Signup successful");
+      setActiveTab("login");
+      setSignupInput({ name: "", email: "", password: "" });
     }
 
-    // Handle successful login
-    if (loginIsSuccess && loginData) {
-        setTimeout(() => {
-            toast.success(loginData.message || "Login Successful.");
-            localStorage.setItem("token", loginData.token); // Optional: store token if needed
-            navigate("/"); // Navigate to home on successful login
-        }, 0);
-    }
-
-    // Error handling for registration
     if (registerError) {
-        const errorMessage = registerError?.data?.message || "Signup failed. Please try again.";
-        toast.error(errorMessage);
-        console.error("Registration Error:", registerError);
+      const errorMessage = registerError?.data?.message || "Signup failed";
+      toast.error(errorMessage);
     }
 
-    // Error handling for login
     if (loginError) {
-        const errorMessage = loginError?.data?.message || "Login failed. Please check your credentials.";
-        toast.error(errorMessage);
-        console.error("Login Error:", loginError);
+      const errorMessage = loginError?.data?.message || "Login failed";
+      toast.error(errorMessage);
     }
-}, [
-    loginIsSuccess,
-    registerIsSuccess,
-    loginError,
-    registerError,
-    registerData,
-    loginData,
-    navigate
-]);
+  }, [registerIsSuccess, registerError, registerData, loginError]);
+
 
 
     return (

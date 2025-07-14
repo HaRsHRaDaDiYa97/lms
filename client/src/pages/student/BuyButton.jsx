@@ -3,7 +3,7 @@ import React from "react";
 const BuyButton = ({ amount, courseId, userId, refetchCourse }) => {
   const handlePayment = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/payment/order", {
+      const res = await fetch("http://localhost:8000/api/v1/payment/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount }),
@@ -17,7 +17,7 @@ const BuyButton = ({ amount, courseId, userId, refetchCourse }) => {
       }
 
       const options = {
-        key: "rzp_test_Q4qHwMlkkBKxWQ",
+        key: "rzp_test_7wAJNl44FVc9cR",
         amount: data.order.amount,
         currency: data.order.currency,
         order_id: data.order.id,
@@ -27,7 +27,7 @@ const BuyButton = ({ amount, courseId, userId, refetchCourse }) => {
           alert(`✅ Payment successful! Payment ID: ${response.razorpay_payment_id}`);
 
           try {
-            const saveRes = await fetch("http://localhost:8000/api/purchase/save", {
+            const saveRes = await fetch("http://localhost:8000/api/v1/purchase/save", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
